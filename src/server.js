@@ -1,19 +1,33 @@
 import 'dotenv/config';
-import express from 'express';
-import cors from 'cors';
-import routes from './routes/index.js';
-import helmet from 'helmet';
-import morgan from 'morgan';
 
-const server = express();
-server.use(express.json());
-server.use(cors());
-server.use(helmet());
-server.use(morgan('dev'));
+import fs from 'fs';
+import https from 'https';
+import http from 'http';
+import app from './app.js';
 
-server.use('/', routes);
+const port = process.env.PORT || 3333;
+const baseUrl = process.env.APP_URL || 'localhost';
 
-server.listen(process.env.PORT || 3001, () => {
-  console.log(`Server is running on port ${process.env.PORT || 3001}`);
-  console.log(`URL: http://${process.env.HOST}:${process.env.PORT || 3001}`);
+let server;
+
+if (process.env.SSL_KEY_PATH && process.env.SSL_CERT_PATH) {
+  try {
+    const options = {
+      key: fs.readFileSync(process.env.SSL_KEY_PATH),
+      cert: fs.readFileSync(process.env.SSL_CERT_PATH),
+      ca: fs.readFileSync(process.env.SSL_CA_PATH)
+    };
+    server = https.createServer(options, app);
+    console.log('Servidor iniciado em modo HTTPS.');
+  } catch (error) {
+    console.error('Erro ao ler os certificados SSL. Iniciando em HTTP.', error);
+    server = http.createServer(app);
+  }
+} else {
+  server = http.createServer(app);
+  console.log('Servidor iniciado em modo HTTP.');
+}
+
+server.listen(port, () => {
+  console.log(`🚀 Servidor rodando em ${baseUrl}:${port}`);
 });
