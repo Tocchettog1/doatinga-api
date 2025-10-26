@@ -13,7 +13,7 @@ export default {
             const response = await db("tabela_de_teste");
 
             return res.status(200).json({
-                status: "Success",
+                success: true,
                 data: response
             });
 
@@ -21,5 +21,5 @@ export default {
             next(error);
         }
     },
-    
+
 }
