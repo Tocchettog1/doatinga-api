@@ -10,10 +10,10 @@ export default {
             const { name } = req.query;
             
             //const query = req.query;
-            let institutions = await db('institutions').select()
+            let institutions = await db('institutions').select('*')
                 .where((builder) => {
                     if (name){
-                        builder.where('name','LIKE',`${name}%`)
+                        builder.where('name','LIKE',`%${name}%`)
                     }
                 })
 
