@@ -17,7 +17,7 @@ export default {
                 data: response
             })
         } catch (error) {
-            next(error)
+            return next(error)
         }
     }
 }
