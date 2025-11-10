@@ -8,9 +8,12 @@ const routes = express.Router();
 
 /** Auth */
 routes.use(authRouter);
+
+/** Institutions */
+routes.use('/institutions', InstitutionsRouter);
+
+/** Utils */
 routes.use(exampleRouter);
 routes.use(utilsRouter);
-
-routes.use('/Institutions', InstitutionsRouter)
 
 export default routes;
