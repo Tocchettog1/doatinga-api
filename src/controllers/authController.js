@@ -44,12 +44,51 @@ export default {
                 expiresIn: validity,
             });
 
-            return res.status(200).json({
+            return res.status(201).json({
                 status: "Success",
                 token,
                 expiresIn: expiration
             });
 
+        } catch (error) {
+            return next(error);
+        }
+    },
+
+    async signIn(req, res, next) {
+        const { email, password } = req.body;
+        const validity = process.env.JWT_EXPIRES_IN;
+        const expiration = dayjs().add(validity, 'seconds').format('YYYY-MM-DD HH:mm:ss');
+        const emailRegex = new RegExp(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/);
+
+        try {
+            if (!email || !password) {
+                throw new AppError('Email and password are required', 406);
+            };
+
+            if (!emailRegex.test(email)) {
+                throw new AppError('Invalid email format', 401);
+            }
+
+            const user = await db('users')
+                .select('id', 'password')
+                .first()
+                .where({ email });
+
+            if (!user || user.password !== password) {
+                throw new AppError('Incorrect email or password', 403);
+            }
+
+            const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
+                expiresIn: validity,
+            });
+
+
+            return res.status(200).json({
+                status: "Success",
+                token,
+                expiresIn: expiration
+            });
         } catch (error) {
             return next(error);
         }
