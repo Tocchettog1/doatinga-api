@@ -14,7 +14,7 @@ const config = {
     user: process.env.DB_USER,
     database: process.env.DB_DATABASE,
     password: process.env.DB_PASSWORD,
-    ssl: { rejectUnauthorized: false }
+    ssl: false
   },
   migrations: {
     directory: path.join(__dirname, 'src', 'data', 'migrations')
