@@ -7,18 +7,21 @@ import { toCamelCase } from "../utils/format.js";
 export default {
     async getAll(req, res, next) {
         try {
-            const { name } = req.query;
-            
+            const { name, adress } = req.query;
+
             //const query = req.query;
-            let institutions = await db('institutions').select('*')
+            let institutions = await db('institutions')
+                .select('institutions.*', 'opening_d.*')
+                .leftJoin('institution_opening_days as opening_d',
+                    'opening_d.institution', 'institutions.id')
                 .where((builder) => {
-                    if (name){
-                        builder.where('name','LIKE',`%${name}%`)
+                    if (name) {
+                        builder.where('name', 'LIKE', `%${name}%`)
                     }
                 })
 
             institutions = toCamelCase(institutions);
-            
+
             return res.status(200).json({
                 status: true,
                 data: institutions
@@ -28,6 +31,4 @@ export default {
             return next(error);
         }
     },
-
 }
-
