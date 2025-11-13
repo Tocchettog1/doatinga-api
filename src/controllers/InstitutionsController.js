@@ -10,7 +10,10 @@ export default {
             const { name } = req.query;
             
             //const query = req.query;
-            let institutions = await db('institutions').select('*')
+            let institutions = await db('institutions')
+            .select('institutions.*','opening_d.*')
+            .leftJoin('institution_opening_days as opening_d',
+                'opening_d.institution','institutions.id')
                 .where((builder) => {
                     if (name){
                         builder.where('name','LIKE',`%${name}%`)
