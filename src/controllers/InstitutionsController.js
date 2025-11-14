@@ -7,18 +7,36 @@ import { toCamelCase } from "../utils/format.js";
 export default {
     async getAll(req, res, next) {
         try {
-            const { name, adress } = req.query;
+            const { name } = req.query;
+            const { adress, number } = req.query;
 
             //const query = req.query;
-            let institutions = await db('institutions')
-                .select('institutions.*', 'opening_d.*')
-                .leftJoin('institution_opening_days as opening_d',
-                    'opening_d.institution', 'institutions.id')
-                .where((builder) => {
+            let queryResponse = await db('institutions')
+                .select('*').where((builder) => {
                     if (name) {
                         builder.where('name', 'LIKE', `%${name}%`)
                     }
+                    if (adress) {
+                        builder.where('adress', 'LIKE', `%${adress}%`)
+                        if (number) {
+                            builder.andWhere('number', 'LIKE', `%${number}%`)
+                        }
+                    }
                 })
+            
+            let openingdays = await db('institution_opening_days').select('*');
+
+            let institutions = queryResponse.map(institution => {
+                return {...institution,openingdays};
+            })
+
+            // retornar para insti um novo array de objetos
+            // fazer o camlcase dentro de openingdays
+            //  antes de acrescentar o objeto
+            //  spread
+
+
+            //Abertos (Filtrar pelo dia atual + hora dentro do horário de funcionamento
 
             institutions = toCamelCase(institutions);
 
@@ -28,6 +46,7 @@ export default {
             });
 
         } catch (error) {
+            console.log(error)
             return next(error);
         }
     },
