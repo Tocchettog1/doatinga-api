@@ -1,0 +1,27 @@
+async putOpeningDays(req, res, next) {
+        try {
+
+            const { idInstitution, idDay } = req.params;
+            const { openingHours, closingHours, openingDay } = req.body;
+
+            await db('institution_opening_days')
+                .where('institution', idInstitution)
+                .andWhere('id', idDay)
+                .update({
+                    opening_hours: openingHours,
+                    closing_hours: closingHours,
+                    opening_day: openingDay
+                });
+
+            return res.status(200).json({
+                status: true,
+                message: 'Horário de funcionamento alterado com sucesso.'
+            });
+
+        }
+        catch (error) {
+            console.log(error);
+            return next(error);
+
+        }
+    }
