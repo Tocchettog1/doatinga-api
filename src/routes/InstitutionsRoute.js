@@ -1,8 +1,17 @@
 import { Router } from "express";
 import InstitutionsController from "../controllers/InstitutionsController.js";
 
-const InstitutionsRouter = Router();
+const institutionsRouter = Router();
 
-InstitutionsRouter.get('/', InstitutionsController.getAll);
+institutionsRouter.get('/', InstitutionsController.getAll);
 
-export default InstitutionsRouter;
+institutionsRouter.get('/:idInstitution', InstitutionsController.getById);
+
+institutionsRouter.post('/', InstitutionsController.post);
+
+// institutionsRouter.put('/:id/opening-days/:idDay', InstitutionsController.putOpeningDays);
+
+institutionsRouter.delete('/:id', InstitutionsController.delete);
+
+
+export default institutionsRouter;
