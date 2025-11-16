@@ -1,8 +1,10 @@
 import db from "../data/database.js";
 import AppError from "../utils/AppError.js";
-import { toCamelCase } from "../utils/format.js";
+import { toCamelCase, toSnakeCase } from "../utils/format.js";
 
 export default {
+
+    // Only Institutions
     async getAll(req, res, next) {
         try {
             const { name } = req.query;
@@ -118,7 +120,106 @@ export default {
             return next(error)
         }
 
+    },
+
+
+    // Institutions Opening Days
+
+
+    async getAllInstitutionOpeningDays(req, res, next) {
+
+        try {
+            const { id } = req.params;
+
+            let institutionOpeningDays = await db('institution_opening_days').where('institution', id).select('*')
+
+            institutionOpeningDays = toCamelCase(institutionOpeningDays);
+
+            return res.status(200).json({
+                status: true,
+                data: institutionOpeningDays
+            })
+
+        } catch (error) {
+            return next(error);
+
+        }
+    },
+
+    async getInstitutionOpeningDaysById(req, res, next) {
+
+        try {
+            const { id, idDay } = req.params;
+
+            let institutionOpeningDay = await db('institution_opening_days').where('institution', id).andWhere('id', idDay).select('*');
+
+            institutionOpeningDay = toCamelCase(institutionOpeningDay);
+
+            return res.status(200).json({
+                status: true,
+                data: institutionOpeningDay
+            })
+
+        } catch (error) {
+            return next(error);
+
+        }
+    },
+
+    async putInstitutionOpeningDays(req, res, next) {
+
+        try {
+            const { id, idDay } = req.params;
+            const body = req.body;
+            console.log('1')
+
+            await db('institution_opening_days').where('institution', id)
+                .andWhere('id', idDay).update(body);
+
+            console.log('2')
+            return res.status(200).json({
+                status: true,
+                messege: 'Horário da instituição atualizado com sucesso.'
+            })
+
+        } catch (error) {
+            console.log(error)
+            return next(error)
+        }
+    },
+
+    async postInstitutionOpeningDays(req, res, next) {
+
+        try {
+            const data = req.body;
+
+            await db('institution_opening_days').insert(data);
+
+            return res.status(200).json({
+                status: true,
+                messege: 'Horário da instituição criado com sucesso.'
+            })
+
+        } catch (error) {
+            console.log(error)
+            return next(error);
+        }
+    },
+
+    async deleteInstitutionOpeningDays(req, res, next) {
+
+        try {
+            const { id, idDay } = req.params;
+
+            await db('institution_opening_days').where('id',idDay).andWhere('institution', id) .del();
+
+            return res.status(200).json({
+                status: true,
+                messege: "Horários da instituição deletados com suceso."
+            })
+
+        } catch (error) {
+            return next(error);
+        }
     }
-
-
 }

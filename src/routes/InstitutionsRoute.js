@@ -3,15 +3,31 @@ import InstitutionsController from "../controllers/InstitutionsController.js";
 
 const institutionsRouter = Router();
 
+
+// Only Institutions
+
 institutionsRouter.get('/', InstitutionsController.getAll);
 
-institutionsRouter.get('/:idInstitution', InstitutionsController.getById);
+institutionsRouter.get('/:id', InstitutionsController.getById);
+
+institutionsRouter.put('/:id', InstitutionsController.put);
 
 institutionsRouter.post('/', InstitutionsController.post);
 
-// institutionsRouter.put('/:id/opening-days/:idDay', InstitutionsController.putOpeningDays);
-
 institutionsRouter.delete('/:id', InstitutionsController.delete);
+
+
+// Institutions Opening Days
+
+institutionsRouter.get('/:id/opening-days', InstitutionsController.getAllInstitutionOpeningDays);
+
+institutionsRouter.get('/:id/opening-days/:idDay', InstitutionsController.getInstitutionOpeningDaysById);
+
+institutionsRouter.put('/:id/opening-days/:idDay', InstitutionsController.putInstitutionOpeningDays);
+
+institutionsRouter.post('/opening-days', InstitutionsController.postInstitutionOpeningDays);
+
+institutionsRouter.delete('/:id/opening-days/:idDay', InstitutionsController.deleteInstitutionOpeningDays);
 
 
 export default institutionsRouter;
