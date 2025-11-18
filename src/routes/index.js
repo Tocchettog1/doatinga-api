@@ -2,7 +2,7 @@ import express from 'express';
 import exampleRouter from './exampleRoute.js';
 import utilsRouter from './utilsRoute.js';
 import authRouter from './authRoute.js';
-import InstitutionsRouter from './InstitutionsRoute.js';
+import institutionsRouter from './InstitutionsRoute.js';
 import donationRouter from './donationsRoute.js';
 
 const routes = express.Router();
@@ -11,7 +11,7 @@ const routes = express.Router();
 routes.use(authRouter);
 
 /** Institutions */
-routes.use('/institutions', InstitutionsRouter);
+routes.use('/institutions', institutionsRouter);
 
 /** Donations */
 routes.use('/donations', donationRouter);
