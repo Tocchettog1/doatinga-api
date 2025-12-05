@@ -9,7 +9,7 @@ export default {
     async getAll(req, res, next) {
         try {
             const { name } = req.query;
-            const { adress, number } = req.query;
+            const { street, number } = req.query;
             const { open_at } = req.query;
 
             var now = dayjs();
@@ -23,8 +23,8 @@ export default {
                         builder.where('name', 'LIKE', `%${name}%`)
                     }
 
-                    if (adress) {
-                        builder.where('adress', 'LIKE', `%${adress}%`)
+                    if (street) {
+                        builder.where('street', 'LIKE', `%${street}%`)
                         if (number) {
                             builder.andWhere('number', 'LIKE', `%${number}%`)
                         }
@@ -116,6 +116,7 @@ export default {
             })
 
         } catch (error) {
+            console.log(error);
             return next(error);
         }
 
@@ -138,7 +139,7 @@ export default {
 
     },
 
-
+    
     // Institutions Opening Days
 
 
