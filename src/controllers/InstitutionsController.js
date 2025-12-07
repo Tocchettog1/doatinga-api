@@ -41,16 +41,7 @@ export default {
                             builder.andWhere('number', 'LIKE', `%${number}%`)
                         }
                     }
-
-
-
-                    //open at = true
-
-                    //Buscar se o dia de hoje está aberto e se estiver:
-                    //Buscar se o horario atual está entre os horários de abertura e fechadura da instituição e se o dia 
                 })
-
-
 
             let openingDays = await db('institution_opening_days').select('*');
             openingDays = toCamelCase(openingDays);

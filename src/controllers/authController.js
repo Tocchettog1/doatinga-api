@@ -2,6 +2,7 @@ import jwt from 'jsonwebtoken';
 import AppError from '../utils/AppError.js';
 import db from '../data/database.js';
 import dayjs from 'dayjs';
+import { toCamelCase } from '../utils/format.js';
 
 export default {
     async signUp(req, res, next) {
@@ -83,7 +84,6 @@ export default {
                 expiresIn: validity,
             });
 
-
             return res.status(200).json({
                 status: "Success",
                 token,
@@ -93,4 +93,92 @@ export default {
             return next(error);
         }
     },
+
+    async getAll(req, res, next) {
+
+        try {
+
+            const { name } = req.query;
+
+            let response = await db('users as u').select('*').where((builder) => {
+                if (name) {
+                    builder.where('u.name', 'like', `%${name}%`)
+                }
+            })
+
+            let user = toCamelCase(response);
+
+            return res.status(200).json({
+                status: 'Success',
+                data: user
+            })
+
+        } catch (error) {
+            console.log(error);
+            return next(error);
+        }
+    },
+
+    async getById(req, res, next) {
+
+        try {
+
+            const { id } = req.params;
+
+            const response = await db('users as u').select('*').where('u.id', id);
+
+            let user = toCamelCase(response);
+
+            return res.status(200).json({
+                status: 'Success',
+                data: user
+            })
+
+        } catch (error) {
+            console.log(error);
+            return next(error);
+        }
+    },
+
+    async put(req, res, next) {
+
+        try {
+
+            const { id } = req.params;
+            const body = req.body;
+
+            const response = await db('users as u').where('u.id', id).update(body);
+
+            let user = toCamelCase(response);
+
+            return res.status(200).json({
+                status: 'Success',
+                data: user
+            })
+
+        } catch (error) {
+            console.log(error);
+            return next(error);
+        }
+    },
+    async delete(req, res, next) {
+
+        try {
+
+            const { id } = req.params;
+
+            const response = await db('users as u').where('u.id', id).del();
+
+            let user = toCamelCase(response);
+
+            return res.status(200).json({
+                status: 'Success',
+                data: user
+            })
+
+        } catch (error) {
+            console.log(error);
+            return next(error);
+        }
+    }
 };

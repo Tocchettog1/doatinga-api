@@ -1,7 +1,6 @@
 import db from '../data/database.js';
 import { toCamelCase } from '../utils/format.js';
 
-
 export default {
     async post(req, res, next) {
         const { body } = req;
@@ -32,7 +31,7 @@ export default {
             await db("donations")
                 .insert(donationData);
 
-            return res.status(201).json({
+            return res.status(200).json({
                 status: "Success",
                 message: "Doação criada com sucesso"
             });
@@ -41,12 +40,20 @@ export default {
             return next(error);
         }
     },
+
     async getAll(req, res, next) {
-        
+
         try {
 
-            let donations = await db('donations').select('*');
-                
+            const { name } = req.query;
+
+            let donations = await db('donations as d').select('*').where((builder) => {
+
+                if (name) {
+                    builder.where('d.name', 'like', `%${name}%`);
+                }
+            });
+
             donations = toCamelCase(donations);
 
             return res.status(200).json({
@@ -55,7 +62,6 @@ export default {
             })
 
         } catch (error) {
-            console.log(error);
             return next(error);
         }
     },
@@ -78,7 +84,7 @@ export default {
             return next(error);
         }
     },
-    
+
     async getById(req, res, next) {
 
         try {
