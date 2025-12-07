@@ -125,6 +125,10 @@ export default {
 
             const { id } = req.params;
 
+            if(Number(id) !== req.userId){
+                throw new AppError('Acesso negado', 403)
+            }
+
             const response = await db('users as u').select('*').where('u.id', id);
 
             let user = toCamelCase(response);
@@ -147,6 +151,10 @@ export default {
             const { id } = req.params;
             const body = req.body;
 
+            if(Number(id) !== req.userId){
+                throw new AppError('Acesso negado', 403)
+            }
+
             const response = await db('users as u').where('u.id', id).update(body);
 
             let user = toCamelCase(response);
@@ -166,6 +174,10 @@ export default {
         try {
 
             const { id } = req.params;
+
+            if(Number(id) !== req.userId){
+                throw new AppError('Acesso negado', 403)
+            }
 
             const response = await db('users as u').where('u.id', id).del();
 

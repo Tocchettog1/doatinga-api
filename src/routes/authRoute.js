@@ -1,11 +1,16 @@
 import { Router } from "express";
 import authController from "../controllers/authController.js";
+import authMiddleware from "../middlewares/authMiddleware.js";
 
 const authRouter = Router();
 
-authRouter.get("/users", authController.getAll);
+authRouter.get("/users", authMiddleware, authController.getAll);
 
-authRouter.get("/users/:id", authController.getById);
+authRouter.get("/users/:id", authMiddleware, authController.getById);
+
+authRouter.put("/users/:id", authMiddleware, authController.put);
+
+authRouter.delete("/users/:id", authMiddleware, authController.delete);
 
 authRouter.post("/users/signup", authController.signUp);
 
