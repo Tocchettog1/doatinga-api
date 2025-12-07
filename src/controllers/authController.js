@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
 import AppError from '../utils/AppError.js';
 import db from '../data/database.js';
+import authMiddleware from '../middlewares/authMiddleware.js';
 import dayjs from 'dayjs';
 import { toCamelCase } from '../utils/format.js';
 
@@ -89,8 +90,21 @@ export default {
                 token,
                 expiresIn: expiration
             });
+
         } catch (error) {
-            return next(error);
+            if (error instanceof AppError) {
+                return res.status(error.statusCode).json({
+                    status: "Error",
+                    message: error.message,
+                });
+            }
+
+            console.error("ERRO GRAVE NO SIGN IN:", error);
+
+            return res.status(500).json({
+                status: "Error",
+                message: "Internal Server Error",
+            });
         }
     },
 
@@ -120,14 +134,11 @@ export default {
     },
 
     async getById(req, res, next) {
-
+        console.log('chegou aqui')
         try {
 
-            const { id } = req.params;
-
-            if(Number(id) !== req.userId){
-                throw new AppError('Acesso negado', 403)
-            }
+            const id = req.userId;
+            console.log(id);
 
             const response = await db('users as u').select('*').where('u.id', id);
 
@@ -148,12 +159,8 @@ export default {
 
         try {
 
-            const { id } = req.params;
+            const id = req.userId;
             const body = req.body;
-
-            if(Number(id) !== req.userId){
-                throw new AppError('Acesso negado', 403)
-            }
 
             const response = await db('users as u').where('u.id', id).update(body);
 
@@ -173,11 +180,7 @@ export default {
 
         try {
 
-            const { id } = req.params;
-
-            if(Number(id) !== req.userId){
-                throw new AppError('Acesso negado', 403)
-            }
+            const id = req.userId;
 
             const response = await db('users as u').where('u.id', id).del();
 

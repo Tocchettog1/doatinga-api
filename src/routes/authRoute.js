@@ -4,18 +4,16 @@ import authMiddleware from "../middlewares/authMiddleware.js";
 
 const authRouter = Router();
 
-authRouter.get("/users", authMiddleware, authController.getAll);
+authRouter.get("/users/all", authController.getAll);
 
-authRouter.get("/users/:id", authMiddleware, authController.getById);
+authRouter.get("/users", authMiddleware, authController.getById);
 
-authRouter.put("/users/:id", authMiddleware, authController.put);
+authRouter.put("/users", authMiddleware, authController.put);
 
-authRouter.delete("/users/:id", authMiddleware, authController.delete);
+authRouter.delete("/users", authMiddleware, authController.delete);
 
 authRouter.post("/users/signup", authController.signUp);
 
 authRouter.post("/users/signin", authController.signIn);
-
-
 
 export default authRouter;
