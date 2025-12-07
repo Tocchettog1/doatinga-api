@@ -1,6 +1,5 @@
 import dayjs from "dayjs";
 import db from "../data/database.js";
-import AppError from "../utils/AppError.js";
 import { toCamelCase, toSnakeCase } from "../utils/format.js";
 
 export default {
@@ -12,10 +11,23 @@ export default {
             const { street, number } = req.query;
             const { open_at } = req.query;
 
-            var now = dayjs();
-            const today = dayjs().day();
+            const today = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SAB'][dayjs().day()]; //função que aponta para o dia de hoje na lista acima.
+            const now = dayjs().format('HH:mm:ss'); //hora exata da requisição
 
-            // const 
+            if (open_at) {
+
+                const queryResponse = await db('institutions as i').join('institution_opening_days as op', 'i.id', '=', 'op.institution').select(
+                    "i.name", "i.cnpj", "i.street", "i.number").where('op.opening_day', 'like', today).andWhere(
+                        'op.opening_hours', '<=', now).andWhere('op.closing_hours', '>=', now);
+
+                let institutions = toCamelCase(queryResponse);
+
+                return res.status(200).json({
+                    status: true,
+                    data: institutions
+                });
+
+            }
 
             const queryResponse = await db('institutions')
                 .select('*').where((builder) => {
@@ -30,16 +42,15 @@ export default {
                         }
                     }
 
-                    if (open_at) {
-                        builder.join('institution_opening_days', 'institutions.id', '=', 
-                            'institution_opening_days.institution').andWhere('day', 'LIKE', `%${day}%`)
-                    }
+
 
                     //open at = true
 
-                        //Buscar se o dia de hoje está aberto e se estiver:
-                            //Buscar se o horario atual está entre os horários de abertura e fechadura da instituição e se o dia 
+                    //Buscar se o dia de hoje está aberto e se estiver:
+                    //Buscar se o horario atual está entre os horários de abertura e fechadura da instituição e se o dia 
                 })
+
+
 
             let openingDays = await db('institution_opening_days').select('*');
             openingDays = toCamelCase(openingDays);
@@ -139,7 +150,7 @@ export default {
 
     },
 
-    
+
     // Institutions Opening Days
 
 
@@ -224,7 +235,7 @@ export default {
         try {
             const { id, idDay } = req.params;
 
-            await db('institution_opening_days').where('id',idDay).andWhere('institution', id) .del();
+            await db('institution_opening_days').where('id', idDay).andWhere('institution', id).del();
 
             return res.status(200).json({
                 status: true,
