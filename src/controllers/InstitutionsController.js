@@ -1,5 +1,5 @@
+import dayjs from "dayjs";
 import db from "../data/database.js";
-import AppError from "../utils/AppError.js";
 import { toCamelCase, toSnakeCase } from "../utils/format.js";
 
 export default {
@@ -8,15 +8,35 @@ export default {
     async getAll(req, res, next) {
         try {
             const { name } = req.query;
-            const { adress, number } = req.query;
+            const { street, number } = req.query;
+            const { open_at } = req.query;
+
+            const today = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SAB'][dayjs().day()]; //função que aponta para o dia de hoje na lista acima.
+            const now = dayjs().format('HH:mm:ss'); //hora exata da requisição
+
+            if (open_at) {
+
+                const queryResponse = await db('institutions as i').join('institution_opening_days as op', 'i.id', '=', 'op.institution').select(
+                    "i.name", "i.cnpj", "i.street", "i.number").where('op.opening_day', 'like', today).andWhere(
+                        'op.opening_hours', '<=', now).andWhere('op.closing_hours', '>=', now);
+
+                let institutions = toCamelCase(queryResponse);
+
+                return res.status(200).json({
+                    status: true,
+                    data: institutions
+                });
+
+            }
 
             const queryResponse = await db('institutions')
                 .select('*').where((builder) => {
                     if (name) {
                         builder.where('name', 'LIKE', `%${name}%`)
                     }
-                    if (adress) {
-                        builder.where('adress', 'LIKE', `%${adress}%`)
+
+                    if (street) {
+                        builder.where('street', 'LIKE', `%${street}%`)
                         if (number) {
                             builder.andWhere('number', 'LIKE', `%${number}%`)
                         }
@@ -62,7 +82,6 @@ export default {
             });
 
         } catch (error) {
-            console.log(error);
             return next(error);
         }
     },
@@ -171,19 +190,16 @@ export default {
         try {
             const { id, idDay } = req.params;
             const body = req.body;
-            console.log('1')
 
             await db('institution_opening_days').where('institution', id)
                 .andWhere('id', idDay).update(body);
 
-            console.log('2')
             return res.status(200).json({
                 status: true,
                 messege: 'Horário da instituição atualizado com sucesso.'
             })
 
         } catch (error) {
-            console.log(error)
             return next(error)
         }
     },
@@ -201,7 +217,6 @@ export default {
             })
 
         } catch (error) {
-            console.log(error)
             return next(error);
         }
     },
@@ -211,7 +226,7 @@ export default {
         try {
             const { id, idDay } = req.params;
 
-            await db('institution_opening_days').where('id',idDay).andWhere('institution', id) .del();
+            await db('institution_opening_days').where('id', idDay).andWhere('institution', id).del();
 
             return res.status(200).json({
                 status: true,
