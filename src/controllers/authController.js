@@ -1,7 +1,6 @@
 import jwt from 'jsonwebtoken';
 import AppError from '../utils/AppError.js';
 import db from '../data/database.js';
-import authMiddleware from '../middlewares/authMiddleware.js';
 import dayjs from 'dayjs';
 import { toCamelCase } from '../utils/format.js';
 
